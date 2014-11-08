@@ -1,0 +1,9 @@
+<?php
+
+define('RPC_USERNAME', 'rpcuser');
+define('RPC_PASSWORD', 'rpcpass');
+define('RPC_HOSTNAME', 'localhost');
+define('RPC_PORT',     '9332');
+define('COIN_NAME',    'litecoin');
+
+?>

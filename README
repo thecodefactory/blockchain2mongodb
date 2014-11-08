@@ -1,0 +1,69 @@
+-------------------------------------
+Written by Neill Miller (neillm@altcoinlabs.com, neillm@thecodefactory.org)
+-------------------------------------
+
+This is a PHP script to crawl an entire blockchain and store all
+information in an easy to use/retrieve format in a MongoDB database
+for inspection or analysis.  It can also be used to create and keep up
+to date the backend datastore for a blockchain visualizer/explorer.
+
+Since it can take time to crawl the entire blockchain and blockchains
+are frequently updated, this script keeps track of where it left off
+and starts scanning on later runs from that point on.  This makes it
+suitable for repeated runs via cron and ensuring that the MongoDB is
+always up to date.
+
+-------------------------------------
+How to use:
+-------------------------------------
+
+1) Copy localsite.inc.sample to localsite.inc
+2) Update localsite.inc to point to the RPC port of your coin
+   (i.e. bitcoin, litecoin, dogecoin, etc)
+3) Run the script: php blockchain2mongodb.php
+4) Profit!
+
+-------------------------------------
+Troubleshooting:
+-------------------------------------
+
+Problem #1: Program simply says "Starting run at block index -1" and exits
+--
+Solution: Create the mongo database using the command line as follows:
+
+NOTE: DATABASE must match the coin name (e.g. "bitcoin")
+
+use DATABASE
+db.dropDatabase()
+db.createCollection('blocks')
+db.createCollection('transactions')
+db.blocks.insert({"global":"last_block","last_block":0})
+db.blocks.insert({"global":"last_connected_block","last_connected_block":0})
+
+
+Problem #2: Program cannot connect to the coin daemon
+--
+Starting run at block index 0 ...
+PHP Warning:  fopen(http://...@localhost:9333/): failed to open
+stream: HTTP request failed!  in jsonRPCClient.php on line 132
+Failed to retrieve block info at index 0: exception 'Exception' with
+message 'Unable to connect to http://rpcuser:rpcpass@localhost:9333/'
+... snip ...
+
+Solution:
+
+- Be sure that your coin daemon is running.
+- Be sure that your coin daemon will accept RPC commands.
+- Ensure that your rpcuser and rpcpassword fields are set.
+- Ensure that txindex is included in your config (if you just added
+  it, restart the coin daemon with the -reindex command).  This is
+  required because we need a full picture of the blockchain while
+  crawling.
+
+An example configuration is below:
+
+txindex=1
+server=1
+rpcallowip=127.0.0.1
+rpcuser=rpcuser
+rpcpassword=rpcpass
