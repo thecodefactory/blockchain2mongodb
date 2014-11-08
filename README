@@ -40,6 +40,10 @@ db.createCollection('transactions')
 db.blocks.insert({"global":"last_block","last_block":0})
 db.blocks.insert({"global":"last_connected_block","last_connected_block":0})
 
+NOTE: be sure to add indices based on how you use it.  For example:
+
+db.blocks.ensureIndex({'data.height': -1})
+db.transactions.ensureIndex({'data.hash': -1})
 
 Problem #2: Program cannot connect to the coin daemon
 --
